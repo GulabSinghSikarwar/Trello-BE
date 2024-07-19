@@ -6,6 +6,7 @@ const QRCode = require('qrcode');
 const { logger } = require('./logger');
 const { use } = require('../routes/auth/auth.route');
 
+
 const generateToken = (userId) => {
     return jwt.sign({ userId }, 'your_secret_key', { expiresIn: '1h' });
 };
@@ -13,7 +14,10 @@ const generateToken = (userId) => {
 
 const generateQRCode = async (secret) => {
     try {
-        const otpauthUrl = speakeasy.otpauthURL({ secret, label: 'MyApp', issuer: 'MyApp' });
+        const otpauthUrl = `otpauth://totp/MyApp?secret=${secret}&issuer=MyApp `;
+        const url =otpauthUrl
+        logger.debug(`OTP URL : ${url} `)
+        logger.debug(`Secret Recived  : ${secret} `)
 
         return await otpauthUrl;
     } catch (err) {
@@ -68,9 +72,10 @@ const authService = {
 
             const secret = speakeasy.generateSecret({ length: 20 });
             user.secret = secret.base32;
-            await user.save();
-
+            
+            const resp   = await user.save();
             const imageUrl = await generateQRCode(secret.base32);
+            logger.debug(` User Totp Secret and imageURL ${JSON.stringify({secret, base32:secret.base32, imageUrl})}`)
             return { secret: secret.base32, imageUrl };
         } catch (err) {
             console.error('Error enabling 2FA:', err);
