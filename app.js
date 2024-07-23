@@ -19,7 +19,9 @@ const sessionStore = new MongoDBStore({
     expires: 1000 * 60 * 60 * 24, // Session expiration in milliseconds (1 day)
 });
 
-app.use(cors());
+app.use(cors({
+    origin:"*"
+}));
 
 app.use(session({
     secret: 'your_session_secret',
@@ -38,7 +40,7 @@ app.use(bodyParser.json()); // Parse JSON bodies
 app.use(morganMiddleware);
 app.use(routes);
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     connectDB();
     logger.info(`Server running on port ${PORT}`);
