@@ -5,10 +5,12 @@ const mongoose = require('mongoose');
 const { connectDB, dbName } = require('./config/db');
 const { logger, morganMiddleware } = require('./services/logger');
 const routes = require('./routes/index');
+const passport = require("passport");
+const passportStrategy = require("./config/passport");
 require('dotenv').config({ path: '.env.local' });
 
 const app = express();
-const cors =require('cors')
+const cors = require('cors');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const sessionStore = new MongoDBStore({
@@ -17,7 +19,9 @@ const sessionStore = new MongoDBStore({
     expires: 1000 * 60 * 60 * 24, // Session expiration in milliseconds (1 day)
 });
 
-app.use(cors());
+app.use(cors({
+    origin:"*"
+}));
 
 app.use(session({
     secret: 'your_session_secret',
@@ -27,6 +31,9 @@ app.use(session({
     cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 }, // Example: session cookie valid for 1 day
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(bodyParser.json()); // Parse JSON bodies
 
@@ -35,6 +42,6 @@ app.use(routes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
-    const connection = connectDB();
+    connectDB();
     logger.info(`Server running on port ${PORT}`);
 });

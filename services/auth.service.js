@@ -7,7 +7,7 @@ const { logger } = require('./logger');
 const { use } = require('../routes/auth/auth.route');
 
 
-const generateToken = (userId) => {
+ const generateToken = (userId) => {
     return jwt.sign({ userId }, 'your_secret_key', { expiresIn: '1h' });
 };
 
@@ -15,7 +15,7 @@ const generateToken = (userId) => {
 const generateQRCode = async (secret) => {
     try {
         const otpauthUrl = `otpauth://totp/MyApp?secret=${secret}&issuer=MyApp `;
-        const url =otpauthUrl
+        const url = otpauthUrl
         logger.debug(`OTP URL : ${url} `)
         logger.debug(`Secret Recived  : ${secret} `)
 
@@ -72,10 +72,10 @@ const authService = {
 
             const secret = speakeasy.generateSecret({ length: 20 });
             user.secret = secret.base32;
-            
-            const resp   = await user.save();
+
+            const resp = await user.save();
             const imageUrl = await generateQRCode(secret.base32);
-            logger.debug(` User Totp Secret and imageURL ${JSON.stringify({secret, base32:secret.base32, imageUrl})}`)
+            logger.debug(` User Totp Secret and imageURL ${JSON.stringify({ secret, base32: secret.base32, imageUrl })}`)
             return { secret: secret.base32, imageUrl };
         } catch (err) {
             console.error('Error enabling 2FA:', err);
@@ -89,8 +89,8 @@ const authService = {
             const user = await User.findById(userId);
             if (!user) throw new Error('User not found');
 
-            console.log(" user : ",user);
-            console.log(" sec : ",user.totpSecret);
+            console.log(" user : ", user);
+            console.log(" sec : ", user.totpSecret);
             const verified = speakeasy.totp.verify({
                 secret: user.totpSecret,
                 encoding: 'base32',
@@ -108,6 +108,7 @@ const authService = {
             throw new Error('Failed to verify 2FA');
         }
     },
+    generateToken
 };
 
 module.exports = authService;
