@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
-    console.log(".............");
+
     console.log("User id : ", userId);
     const user = await User.findById(userId);
     if (!user) {
