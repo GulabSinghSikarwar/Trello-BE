@@ -5,7 +5,8 @@ const Task = require('../../models/Tasks')
 const { Types } = require('mongoose')
 const { ObjectId } = require('mongodb');
 const { formatTaskStatus, formatAllTasks } = require('./task.util')
-const { updateTaskStatus } = require('../../controllers/Tasks/task.controller')
+const { updateTaskStatus } = require('../../controllers/Tasks/task.controller');
+const { logger } = require('../../services/logger');
 // Create a new task
 
 router.post('/', async (req, res) => {
@@ -112,21 +113,23 @@ router.patch('/:id', async (req, res) => {
 });
 router.patch('/:taskId/status', updateTaskStatus);
 
-// Delete a task
 router.delete('/:id', async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
-    if (task.user.toString() !== req.user.id) {
+
+    logger.debug(`Task to be deleted: ${task}\nUserID: ${req.body.userId}\nSame User ID: ${task.userId.toString()} === ${req.body.userId}, ${task.userId.toString() === req.body.userId}`);
+    if (task.userId.toString() !== req.body.userId) {
       return res.status(403).json({ message: 'Unauthorized access' });
     }
-    await task.remove();
-    res.status(204).json({ message: 'Task deleted' });
+
+    await Task.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: 'Task deleted' , task});
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting task' });
+    logger.error(`Error deleting task: ${error.message}`);
+    res.status(500).json({ message: error.message });
   }
 });
-
 module.exports = router;
