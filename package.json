@@ -23,6 +23,7 @@
     "winston": "^3.13.1"
   },
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "migrate":"node  config/migrations/index.js"
   }
 }
