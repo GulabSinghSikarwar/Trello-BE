@@ -17,7 +17,7 @@ const taskSchema = new Schema({
     },
     priority: {
         type: String,
-        enum: ['Low', 'Medium', 'High'],
+        enum: ['Low', 'Medium', 'High', 'Blocker', 'Critical'], // Added 'Critical' here
         default: 'Medium'
     },
     dueDate: {
@@ -64,5 +64,6 @@ taskSchema.pre('save', function (next) {
     }
     next();
 });
+
 const Task = mongoose.model('Task', taskSchema);
 module.exports = Task;

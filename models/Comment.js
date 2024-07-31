@@ -19,7 +19,15 @@ const commentSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  profilePicture: {
+    type: Schema.Types.String
+  },
+  replies: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Reply'
+    }]
 });
 
 const Comment = mongoose.model('Comment', commentSchema);

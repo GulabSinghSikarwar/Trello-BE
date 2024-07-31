@@ -7,8 +7,13 @@ const { ObjectId } = require('mongodb');
 const { formatTaskStatus, formatAllTasks } = require('./task.util')
 const { updateTaskStatus } = require('../../controllers/Tasks/task.controller');
 const { logger } = require('../../services/logger');
+const commentRouter = require('./commentRoutes/comments.routes')
+const replyRouter = require('./repliesRoutes/replies.routes')
+const commentController =require('../../controllers/Tasks/taskComments/comment.controller')
 // Create a new task
 
+router.use('/comments', commentRouter)
+router.use('/replies', replyRouter)
 router.post('/', async (req, res) => {
   try {
     const user = await User.findById(req.body.userId);
@@ -126,10 +131,13 @@ router.delete('/:id', async (req, res) => {
     }
 
     await Task.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: 'Task deleted' , task});
+    res.status(200).json({ message: 'Task deleted', task });
   } catch (error) {
     logger.error(`Error deleting task: ${error.message}`);
     res.status(500).json({ message: error.message });
   }
 });
+router.use('/:id/comments', commentController.fetchAllcomments)
+
+
 module.exports = router;

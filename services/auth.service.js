@@ -31,6 +31,7 @@ const authService = {
         try {
             const user = new User({ username, password });
             const userdetails = await user.save();
+            logger.info(`USER  Found : : ${user}`)
             return userdetails
         } catch (err) {
             console.error('Error registering user:', err.message);
