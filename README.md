@@ -57,3 +57,22 @@ Open `constant.js` Edit the the google credentials  for the Google Auth Feature:
 
     $ npm build
     
+Here's an example of how you can use a message queue to improve the microservice architecture for the Task and Attachment services:
+
+Task Service
+
+The Task Service creates a new task and stores it in the database.
+The Task Service sends a TaskCreated message to a message queue (e.g., task_created_queue).
+The message contains the task ID and any other relevant information.
+Attachment Service
+
+The Attachment Service listens to the task_created_queue message queue.
+When a TaskCreated message is received, the Attachment Service processes the attachment for the task.
+The Attachment Service uploads the attachment to centralized storage and stores the attachment metadata in its own database.
+The Attachment Service sends a AttachmentProcessed message to a message queue (e.g., attachment_processed_queue).
+The message contains the task ID, attachment ID, and any other relevant information.
+Task Service (continued)
+
+The Task Service listens to the attachment_processed_queue message queue.
+When an AttachmentProcessed message is received, the Task Service updates the task with the attachment information.
+The Task Service returns a response to the client indicating that the task has been created with an attachment.
